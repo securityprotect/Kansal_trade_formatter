@@ -37,29 +37,20 @@ class handler(BaseHTTPRequestHandler):
         # SL detect
         sl = re.search(r'SL[-\s]*(\d+)', text)
 
-        # Values
         strike_text = strike.group(0).title() if strike else ""
         above_text = above.group(1) or above.group(2) if above else ""
         target_text = target.group(1) if target else ""
         sl_text = sl.group(1) if sl else ""
 
-        # If target not found, fallback detect loose targets like 330/380/450++
+        # fallback target
         if not target_text:
             loose_target = re.search(r'(\d+(?:/\d+)+)\+*', text)
             target_text = loose_target.group(1) if loose_target else ""
 
-        # Final format
-        final = f"""📌 {title}
+        # Final output
+        final = f"📌 {title}\n\nStrike: {strike_text}\n\nActive Zone: Above {above_text}\n\nPossible Move: {target_text}\n\nWeakness Below: {sl_text}"
 
-Strike: {strike_text}
-
-Active Zone: Above {above_text}
-
-Possible Move: {target_text}
-
-Weakness Below: {sl_text}"""
-
-        # Send to Telegram channel
+        # Send message
         requests.post(
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
             data={
@@ -74,18 +65,7 @@ Weakness Below: {sl_text}"""
     def do_GET(self):
         self.send_response(200)
         self.end_headers()
-        self.wfile.write(b"Bot running successfully")        sl_text = sl.group(1) if sl else ""
-
-        final = f"""📌 {title}
-
-Strike: {strike_text.title()}
-
-Active Zone: Above {above_text}
-
-Possible Move: {target_text}
-
-Weakness Below: {sl_text}"""
-
+        self.wfile.write(b"Bot running successfully")
         requests.post(
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
             data={"chat_id": CHANNEL, "text": final}
