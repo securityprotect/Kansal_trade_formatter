@@ -8,6 +8,7 @@ TOKEN = os.getenv("TOKEN")
 CHANNEL = os.getenv("CHANNEL")
 
 class handler(BaseHTTPRequestHandler):
+
     def do_POST(self):
         content_length = int(self.headers['Content-Length'])
         body = self.rfile.read(content_length)
@@ -25,7 +26,15 @@ class handler(BaseHTTPRequestHandler):
         target_text = target.group(1) if target else ""
         sl_text = sl.group(1) if sl else ""
 
-        final = f"📌 {strike_text} | above {above_text} | {target_text} possible | below {sl_text} weak"
+        final = f"""📌 Market View
+
+Strike: Nifty {strike_text}
+
+Active Zone: Above {above_text}
+
+Possible Move: {target_text}
+
+Weakness Below: {sl_text}"""
 
         requests.post(
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
